@@ -111,3 +111,21 @@ onAuthStateChanged(auth, (user) => {
         });
     }
 });
+
+// The "Module Way" to handle clicks on the table
+// The "Module Way" to handle clicks on the table (Instant Delete)
+tableBody.addEventListener('click', async (e) => {
+    const deleteBtn = e.target.closest('.delete-btn');
+    
+    if (deleteBtn) {
+        const id = deleteBtn.getAttribute('data-id');
+        
+        try {
+            // No popup, just straight to the cloud deletion
+            await deleteDoc(doc(db, "expenses", id));
+            console.log("Transaction deleted from Cloud!");
+        } catch (error) {
+            console.error("Error removing document: ", error);
+        }
+    }
+});
