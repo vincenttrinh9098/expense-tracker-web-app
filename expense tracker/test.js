@@ -33,47 +33,60 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Add this line at the top with your other variables!
-const transactionForm = document.getElementById('transactionForm'); 
 
-// Added 'e' inside the parentheses here!
-transactionForm.addEventListener('submit', (e) => { 
+const transactionForm = document.getElementById('transactionForm'); 
+let allTransactions = []; 
+
+transactionForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
-    const date = document.getElementById('inputDate').value;
-    const desc = document.getElementById('inputDesc').value;
-    const cat = document.getElementById('inputCategory').value;
-    const type = document.getElementById('inputType').value;
-    const amount = parseFloat(document.getElementById('inputAmount').value);
-    if(type=='Income'){
-        income+= amount;
-        monthlyIncome.textContent = `$${income.toLocaleString()}`;
+    // 1. Create a Data Object (This is what gets saved to a User's ID later)
+    const transaction = {
+        id: Date.now(), // Unique ID for deleting/editing
+        date: document.getElementById('inputDate').value,
+        desc: document.getElementById('inputDesc').value,
+        cat: document.getElementById('inputCategory').value,
+        type: document.getElementById('inputType').value,
+        amount: parseFloat(document.getElementById('inputAmount').value)
+    };
 
-    }else if (type=='Expense'){
-        expense+=amount;
-        monthlyExpense.textContent = `$${expense.toLocaleString()}`;
+    // 2. Add to our local list
+    allTransactions.push(transaction);
 
-
-    }
-
+    // 3. Update the UI based on the Data
+    renderTransactions();
     
-
-    const newRow = `
-        <tr>
-            <td>${date}</td>
-            <td>${desc}</td>
-            <td>${cat}</td>
-            <td>$${amount.toLocaleString()}</td>
-            <td>
-                <button class="menuButtons"><i class='bx bxs-edit' ></i></button>
-                <button class="menuButtons delete-btn">X</button>
-            </td>
-        </tr>
-    `;
-
-    tableBody.insertAdjacentHTML('afterbegin', newRow);
-    
-    // Close modal and reset fields
     modal.classList.remove('show');
     transactionForm.reset(); 
 });
+
+function renderTransactions() {
+    tableBody.innerHTML = ''; // Clear the table
+    income = 0;
+    expense = 0;
+
+    allTransactions.forEach(t => {
+        // Calculations
+        if(t.type === 'Income') income += t.amount;
+        else expense += t.amount;
+
+        // Visual Table Row
+        const row = `
+            <tr>
+                <td>${t.date}</td>
+                <td>${t.desc}</td>
+                <td><span class="category-badge">${t.cat}</span></td>
+                <td class="${t.type === 'Income' ? 'income-text' : 'expense-text'}">
+                    ${t.type === 'Income' ? '+' : '-'}$${t.amount.toLocaleString()}
+                </td>
+                <td>
+                    <button class="delete-btn" onclick="deleteItem(${t.id})">X</button>
+                </td>
+            </tr>
+        `;
+        tableBody.insertAdjacentHTML('afterbegin', row);
+    });
+
+    monthlyIncome.textContent = `$${income.toLocaleString()}`;
+    monthlyExpense.textContent = `$${expense.toLocaleString()}`;
+}
