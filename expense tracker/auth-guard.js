@@ -1,7 +1,9 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
+import { 
+    getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyCOMSx-62yWKnvc9fgtgj_dnn58KP3Grv0",
@@ -13,8 +15,12 @@ appId: "1:955790613625:web:a270549689c9fcd91108a8"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
+export const auth = getAuth(app);
+export const db = getFirestore(app); // Export the database
+export { 
+    collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy, 
+    onAuthStateChanged, signOut 
+};
 // THE BOUNCER LOGIC
 onAuthStateChanged(auth, (user) => {
 if (!user) {
@@ -44,3 +50,6 @@ signOutBtn.addEventListener('click', (e) => {
         console.error("Sign out error", error);
     });
 });
+
+
+

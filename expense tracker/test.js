@@ -1,3 +1,5 @@
+import { db, auth, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy, onAuthStateChanged} from './auth-guard.js';
+
 const sidebar = document.querySelector('.sidebar');
 const toggleBtn = document.querySelector('.toggle-btn');
 
@@ -37,56 +39,75 @@ window.addEventListener('click', (e) => {
 const transactionForm = document.getElementById('transactionForm'); 
 let allTransactions = []; 
 
-transactionForm.addEventListener('submit', (e) => {
+transactionForm.addEventListener('submit',async (e) => {
     e.preventDefault();
-    
+    const user = auth.currentUser; // Get the currently logged-in user
+    if (!user) return;
     // 1. Create a Data Object (This is what gets saved to a User's ID later)
     const transaction = {
-        id: Date.now(), // Unique ID for deleting/editing
+        uid: user.uid, // The "Locker Number"
         date: document.getElementById('inputDate').value,
         desc: document.getElementById('inputDesc').value,
         cat: document.getElementById('inputCategory').value,
         type: document.getElementById('inputType').value,
-        amount: parseFloat(document.getElementById('inputAmount').value)
+        amount: parseFloat(document.getElementById('inputAmount').value),
+        createdAt: new Date() // For sorting
     };
 
-    // 2. Add to our local list
-    allTransactions.push(transaction);
-
-    // 3. Update the UI based on the Data
-    renderTransactions();
-    
-    modal.classList.remove('show');
-    transactionForm.reset(); 
+    try {
+        // Save to Firestore "expenses" collection
+        await addDoc(collection(db, "expenses"), transaction);
+        modal.classList.remove('show');
+        transactionForm.reset();
+    } catch (error) {
+        console.error("Error adding document: ", error);
+    }
 });
 
-function renderTransactions() {
-    tableBody.innerHTML = ''; // Clear the table
-    income = 0;
-    expense = 0;
+// This function watches the "expenses" collection for the logged-in user
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // 1. Build a query: "Get expenses where UID matches this user"
+        const q = query(
+            collection(db, "expenses"), 
+            where("uid", "==", user.uid),
+            orderBy("date", "desc") // This sorts by date!
+        );
 
-    allTransactions.forEach(t => {
-        // Calculations
-        if(t.type === 'Income') income += t.amount;
-        else expense += t.amount;
+        // 2. Start the Live Listener
+        onSnapshot(q, (snapshot) => {
+            let totalIncome = 0;
+            let totalExpense = 0;
+            tableBody.innerHTML = ''; // Clear the table for a fresh render
 
-        // Visual Table Row
-        const row = `
-            <tr>
-                <td>${t.date}</td>
-                <td>${t.desc}</td>
-                <td><span class="category-badge">${t.cat}</span></td>
-                <td class="${t.type === 'Income' ? 'income-text' : 'expense-text'}">
-                    ${t.type === 'Income' ? '+' : '-'}$${t.amount.toLocaleString()}
-                </td>
-                <td>
-                    <button class="delete-btn" onclick="deleteItem(${t.id})">X</button>
-                </td>
-            </tr>
-        `;
-        tableBody.insertAdjacentHTML('afterbegin', row);
-    });
+            snapshot.forEach((doc) => {
+                const t = doc.data();
+                const id = doc.id; // The unique Firebase ID for deleting
 
-    monthlyIncome.textContent = `$${income.toLocaleString()}`;
-    monthlyExpense.textContent = `$${expense.toLocaleString()}`;
-}
+                // UI Calculations
+                if (t.type === 'Income') totalIncome += t.amount;
+                else totalExpense += t.amount;
+
+                // Create the Row
+                const row = `
+                    <tr>
+                        <td>${t.date}</td>
+                        <td>${t.desc}</td>
+                        <td><span class="badge">${t.cat}</span></td>
+                        <td class="${t.type === 'Income' ? 'text-success' : 'text-danger'}">
+                            ${t.type === 'Income' ? '+' : '-'}$${t.amount.toLocaleString()}
+                        </td>
+                        <td>
+                            <button class="delete-btn" data-id="${id}">X</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            // Update your CardBoxes
+            monthlyIncome.textContent = `$${totalIncome.toLocaleString()}`;
+            monthlyExpense.textContent = `$${totalExpense.toLocaleString()}`;
+        });
+    }
+});
