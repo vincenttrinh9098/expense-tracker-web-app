@@ -15,8 +15,8 @@ body {
     width: 80px;
     height: 100%;
     background: #4a71e0;
-    border-right:2px solid rgba(255,255,255,.2); 
-    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    border-right: 2px solid rgba(255, 255, 255, .2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
     padding: 6px 14px;
     transition: .5s;
     backdrop-filter: blur(40px);
@@ -39,8 +39,9 @@ body {
     color: #fff;
     pointer-events: none;
     opacity: 0;
-    transition:.3s;
+    transition: .3s;
 }
+
 .sidebar.active .logo-menu .logo {
     opacity: 1;
     transition-delay: .2s;
@@ -62,7 +63,7 @@ body {
 }
 
 .sidebar.active .logo-menu .toggle-btn {
-    left:90%;
+    left: 90%;
 
 }
 
@@ -88,8 +89,8 @@ body {
     text-decoration: none;
     display: flex;
     border-radius: 5px;
-    white-space:nowrap;
-    transition:.5s;
+    white-space: nowrap;
+    transition: .5s;
 }
 
 .list .list-item.active a,
@@ -105,13 +106,272 @@ body {
     line-height: 50px;
 }
 
-.sidebar .link-name{
+.sidebar .link-name {
     opacity: 0;
     pointer-events: none;
-    transition:opacity .3s;
+    transition: opacity .3s;
 }
-.sidebar.active .link-name{
+
+.sidebar.active .link-name {
     opacity: 1;
     pointer-events: auto;
-    transition-delay:calc(.1s * var(--i));
+    transition-delay: calc(.1s * var(--i));
+}
+
+
+/* Update your main content area */
+.main-content {
+    position: relative;
+    margin-left: 100px;
+    padding: 30px;
+    transition: margin-left .5s ease;
+    min-height: 100vh;
+}
+
+.sidebar.active~.main-content {
+    margin-left: 280px;
+}
+
+/* THE GRID SYSTEM */
+.cardContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 equal columns */
+    gap: 30px;
+    /* Space between boxes */
+    width: 100%;
+}
+
+/* INDIVIDUAL BOX STYLING */
+.cardBox {
+    background: #fff;
+    padding: 50px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    transition: 0.3s;
+}
+
+.cardBox:hover {
+    background: #4a71e0;
+    /* Matches your sidebar color */
+}
+
+.cardBox:hover .numbers,
+.cardBox:hover .cardName,
+.cardBox:hover .iconBx {
+    color: #fff;
+}
+
+.numbers {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #4a71e0;
+}
+
+.cardName {
+    color: #888;
+    font-size: 1.1rem;
+    margin-top: 5px;
+}
+
+.iconBx {
+    font-size: 3.5rem;
+    color: #888;
+}
+
+.transactions {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-gap: 30px;
+
+}
+
+.transactions .recentTransactions {
+    position: relative;
+    display: grid;
+    min-height: 3 00px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cardHeader h2 {
+    font-weight: 600;
+    color: #4a71e0;
+    font-size: 35px;
+}
+
+.ViewAllBtn {
+    position: relative;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: white;
+    border-radius: 20px;
+    padding: 5px 10px;
+    background: #4a71e0;
+}
+.menuButtons{
+
+    position: relative;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: white;
+    border-radius: 20px;
+    padding: 5px 10px;
+    background: #4a71e0;
+}
+
+.transactions table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.transactions table thead td {
+    font-weight: 600;
+    font-size: 23px;
+
+}
+
+.transactions .recentTransactions table tr {
+    color: black;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+.transactions .recentTransactions table tr:last-child {
+    border-bottom: none;
+}
+
+.transactions .recentTransactions table tbody {
+    font-size: 20px;
+}
+
+/*
+.transactions .recentTransactions table tbody tr:hover {
+    background: #4a72e07f;
+}
+*/
+.transactions .recentTransactions table tr td {
+    padding: 10px;
+}
+
+.transactions .recentTransactions table tr td:last-child {
+    text-align: end;
+}
+
+.transactions .recentTransactions table tr td:nth-child(2) {
+    text-align: left;
+}
+
+.transactions .recentTransactions table tr td:nth-child(3) {
+    text-align: center;
+}
+
+
+
+/* Modal Background (Hidden by default) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dim background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s ease;
+    z-index: 2000;
+}
+
+/* When modal is active */
+.modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: #fff;
+    width: 400px;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transform: translateY(-20px);
+    transition: 0.3s ease;
+}
+
+.modal-overlay.show .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-modal {
+    font-size: 28px;
+    cursor: pointer;
+    color: #888;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.input-group input, .input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+}
+
+.btn-save {
+    width: 100%;
+    padding: 12px;
+    background: #4a71e0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Responsive: Stack them on mobile */
+@media (max-width: 991px) {
+    .cardContainer {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .cardContainer {
+        grid-template-columns: 1fr;
+    }
 }

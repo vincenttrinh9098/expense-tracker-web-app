@@ -13,7 +13,6 @@
             <h2 class="logo">Hub</h2>
             <i class='bx bx-menu toggle-btn'></i>
         </div>
-
         <ul class="list">
 
             <li class="list-item active">
@@ -32,8 +31,8 @@
 
             <li class="list-item">
                 <a href="#">
-                    <i class='bx bx-git-commit' ></i>
-                    <span class="link-name" style="--i:3;">TBD</span>
+                    <i class='bx bx-exit'></i>
+                    <span class="link-name" style="--i:3;">Sign Out</span>
                 </a>
             </li>
 
@@ -53,6 +52,105 @@
             
         </ul>
     </nav>
+    <main class="main-content">
+        <div class="cardContainer">
+            <div class="cardBox">
+                <div>
+                    <div class="numbers">$5,000</div>
+                    <div class="cardName">Monthly Income</div>
+                </div>
+                <div class="iconBx">
+                    <i class='bx bx-money-withdraw'></i>
+                </div>
+            </div>
+
+            <div class="cardBox">
+                <div>
+                    <div class="numbers">$2,100</div>
+                    <div class="cardName">Monthly Expenses</div>
+                </div>
+                <div class="iconBx">
+                    <i class='bx bx-cart'></i>
+                </div>
+            </div>
+
+            <div class="cardBox">
+                <div>
+                    <div class="numbers">$2,900</div>
+                    <div class="cardName">Total Savings</div>
+                </div>
+                <div class="iconBx">
+                    <i class='bx bx-wallet'></i>
+                </div>
+            </div>
+        </div>
+
+        
+    <div class="transactions">
+        <div class="recentTransactions">
+            <div class="cardHeader">
+                <h2>Recent transactions</h2>
+                <a href="#" class="ViewAllBtn">+</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Date</td>
+                        <td>Description</td>
+                        <td>Category</td>
+                        <td>Amount</td>
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Transaction</h2>
+            <i class='bx bx-x close-modal' id="closeModal"></i>
+        </div>
+      <div class="modal-body">
+        <form id="transactionForm">
+            <div class="input-group">
+                <label>Date</label>
+                <input type="date" id="inputDate" required>
+            </div>
+            <div class="input-group">
+                <label>Description</label>
+                <input type="text" id="inputDesc" placeholder="e.g. KBBQ" required>
+            </div>
+            <div class="input-group">
+                <label>Category</label>
+                <select id="inputCategory" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="Dining Out">Dining Out</option>
+                    <option value="Groceries">Groceries</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Entertainment">Entertainment</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Amount ($)</label>
+                <input type="number" id="inputAmount" placeholder="0.00" required>
+            </div>
+            <button type="submit" id="saveTransactionBtn" class="btn-save">Save Transaction</button>
+          </form>
+         </div>
+        </div>
+    </div>
+
+    
+    </main>
+
+
+
     <script src="test.js"></script>
 </body>
 </html>
