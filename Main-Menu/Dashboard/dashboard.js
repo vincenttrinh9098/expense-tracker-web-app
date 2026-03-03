@@ -1,4 +1,6 @@
-import { db, auth, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy, onAuthStateChanged} from './auth-guard.js';
+import { 
+    db, auth, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy, onAuthStateChanged 
+} from '../Authentication/auth-guard.js'; // Added .js
 
 const sidebar = document.querySelector('.sidebar');
 const toggleBtn = document.querySelector('.toggle-btn');

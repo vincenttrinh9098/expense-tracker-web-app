@@ -26,7 +26,7 @@ googleBtn.addEventListener('click', (e) => {
             const user = result.user;
             console.log("Logged in:", user.displayName);
             
-            window.location.href = "../expense tracker/test.html"; 
+            window.location.href = "../Main-Menu/dashboard/dashboard.html"; 
         })
         .catch((error) => {
             console.error("Auth Error:", error.code);

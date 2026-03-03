@@ -25,7 +25,7 @@ export {
 onAuthStateChanged(auth, (user) => {
 if (!user) {
     // No ID Card? Kick them out!
-    window.location.href = "login.html";
+    window.location.href = "../../login page/login.html";
 } else {
     // Welcome in! Let's personalize the dashboard
     console.log("Verified User UID:", user.uid);
@@ -45,7 +45,7 @@ signOutBtn.addEventListener('click', (e) => {
     e.preventDefault();
     signOut(auth).then(() => {
         console.log("User signed out");
-        window.location.href = "../index.html";
+        window.location.href = "../../index.html";
     }).catch((error) => {
         console.error("Sign out error", error);
     });

@@ -362,7 +362,14 @@ body {
     cursor: pointer;
     margin-top: 10px;
 }
+.delete-btn{
+    background: #4a71e0;
+    color:white;
+    padding: 5px 8px;
+    cursor:pointer;
+    border-radius: 10px;
 
+}
 /* Responsive: Stack them on mobile */
 @media (max-width: 991px) {
     .cardContainer {
