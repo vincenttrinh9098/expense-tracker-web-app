@@ -18,8 +18,8 @@ const tableBody = document.querySelector('table tbody');
 let income = 0;
 let expense = 0;
 
-const monthlyIncome = document.getElementById('monthly-income');
-const monthlyExpense = document.getElementById('monthly-expense');
+const currentIncome = document.getElementById('current-income');
+const currentExpense = document.getElementById('current-expense');
 
 
 openModalBtn.addEventListener('click', (e) => {
@@ -65,52 +65,112 @@ transactionForm.addEventListener('submit',async (e) => {
         console.error("Error adding document: ", error);
     }
 });
+// --- EXISTING UI VARIABLES AT TOP ---
+const timeFilter = document.getElementById('timeFilter'); // Ensure this ID exists in your HTML
+let unsubscribe = null; // Variable to hold the listener so we can stop/start it
 
-// This function watches the "expenses" collection for the logged-in user
+// HELPER: Calculate the "Start Date" for filtering
+function getStartDate(period) {
+    const now = new Date();
+    
+    // Reset to the start of the current day (midnight)
+    now.setHours(0, 0, 0, 0);
+
+    if (period === 'week') {
+        // Go back exactly 7 days from today
+        now.setDate(now.getDate() - 7);
+    } else if (period === 'month') {
+        // Option A: If you want EVERYTHING in the current calendar month (March 1st onwards)
+        now.setDate(1); 
+        
+        /* Option B: If you want exactly "Last 30 days", keep it as:
+        now.setMonth(now.getMonth() - 1); 
+        */
+    } else if (period === 'year') {
+        // January 1st of the current year
+        now.setMonth(0, 1);
+    } else {
+        return null; // "all"
+    }
+
+    return now.toISOString().split('T')[0];
+}
+
+// THE MAIN LISTENER FUNCTION
+function setupTransactionListener(user, period = 'all') {
+    // If we have an active listener, kill it before starting a new one
+    if (unsubscribe) unsubscribe();
+
+    // 1. Base Query: User's data sorted by date
+    let q = query(
+        collection(db, "expenses"), 
+        where("uid", "==", user.uid),
+        orderBy("date", "desc")
+    );
+
+    // 2. Add Time Filter if applicable
+    const startDate = getStartDate(period);
+    if (startDate) {
+        // This adds a second "where" clause
+        q = query(q, where("date", ">=", startDate));
+    }
+
+    // 3. Start the Live Listener
+    unsubscribe = onSnapshot(q, (snapshot) => {
+        let totalIncome = 0;
+        let totalExpense = 0;
+        tableBody.innerHTML = ''; 
+
+        if (snapshot.empty) {
+             tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No transactions found for this period.</td></tr>`;
+             monthlyIncome.textContent = "$0";
+             monthlyExpense.textContent = "$0";
+             return;
+        }
+        snapshot.forEach((doc) => {
+            const t = doc.data();
+            const id = doc.id;
+
+            if (t.type === 'Income') totalIncome += t.amount;
+            else totalExpense += t.amount;
+
+            const row = `
+                <tr>
+                    <td>${t.date}</td>
+                    <td>${t.desc}</td>
+                    <td><span class="badge">${t.cat}</span></td>
+                    <td class="${t.type === 'Income' ? 'text-success' : 'text-danger'}">
+                        ${t.type === 'Income' ? '+' : '-'}$${t.amount.toLocaleString()}
+                    </td>
+                    <td>
+                        <button class="delete-btn" data-id="${id}">X</button>
+                    </td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+
+        // Update UI Cards
+        currentIncome.textContent = `$${totalIncome.toLocaleString()}`;
+        currentExpense.textContent = `$${totalExpense.toLocaleString()}`;
+    }, (error) => {
+        // If you see this, you likely need to click the Index Link in the console
+        console.error("Listener failed: ", error);
+    });
+}
+
+// 4. Update the onAuthStateChanged
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // 1. Build a query: "Get expenses where UID matches this user"
-        const q = query(
-            collection(db, "expenses"), 
-            where("uid", "==", user.uid),
-            orderBy("date", "desc") // This sorts by date!
-        );
+        // Start default view (All)
+        setupTransactionListener(user, 'all');
 
-        // 2. Start the Live Listener
-        onSnapshot(q, (snapshot) => {
-            let totalIncome = 0;
-            let totalExpense = 0;
-            tableBody.innerHTML = ''; // Clear the table for a fresh render
-
-            snapshot.forEach((doc) => {
-                const t = doc.data();
-                const id = doc.id; // The unique Firebase ID for deleting
-
-                // UI Calculations
-                if (t.type === 'Income') totalIncome += t.amount;
-                else totalExpense += t.amount;
-
-                // Create the Row
-                const row = `
-                    <tr>
-                        <td>${t.date}</td>
-                        <td>${t.desc}</td>
-                        <td><span class="badge">${t.cat}</span></td>
-                        <td class="${t.type === 'Income' ? 'text-success' : 'text-danger'}">
-                            ${t.type === 'Income' ? '+' : '-'}$${t.amount.toLocaleString()}
-                        </td>
-                        <td>
-                            <button class="delete-btn" data-id="${id}">X</button>
-                        </td>
-                    </tr>
-                `;
-                tableBody.insertAdjacentHTML('beforeend', row);
+        // Watch for dropdown changes
+        if (timeFilter) {
+            timeFilter.addEventListener('change', (e) => {
+                setupTransactionListener(user, e.target.value);
             });
-
-            // Update your CardBoxes
-            monthlyIncome.textContent = `$${totalIncome.toLocaleString()}`;
-            monthlyExpense.textContent = `$${totalExpense.toLocaleString()}`;
-        });
+        }
     }
 });
 

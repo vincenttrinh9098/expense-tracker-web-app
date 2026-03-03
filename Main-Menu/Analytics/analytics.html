@@ -8,6 +8,7 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel="stylesheet">
     <script type="module" src="../Authentication/auth-guard.js"></script>
     <script type="module" src="analytics.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -53,6 +54,44 @@
 
         </ul>
     </nav>
+
+    
+    <main class="main-content">
+        <div class="cardContainer">
+            <div class="cardBox">
+                <div class="chart-container">
+                    <h2>Expenses</h2>
+                    <div class="table-controls">
+                        <select id="timeFilter">
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                    <canvas id="expenseChart"></canvas>
+                </div>    
+            </div>
+    
+            <div class="cardBox">
+                <div class="chart-container">
+                    <canvas id=""></canvas>
+                </div>    
+            </div>
+
+          <div class="cardBox">
+                <div class="chart-container">
+                    <canvas id=""></canvas>
+                </div>    
+            </div>
+
+          <div class="cardBox">
+                <div class="chart-container">
+                    <canvas id=""></canvas>
+                </div>    
+           </div>
+           
+        </div>
+    </main>
 
 </body>
 

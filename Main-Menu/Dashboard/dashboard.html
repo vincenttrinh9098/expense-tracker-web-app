@@ -57,8 +57,8 @@
         <div class="cardContainer">
             <div class="cardBox">
                 <div>
-                    <div id="monthly-income" class="numbers"></div>
-                    <div class="cardName">Monthly Income</div>
+                    <div id="current-income" class="numbers"></div>
+                    <div class="cardName">Current Income</div>
                 </div>
                 <div class="iconBx">
                     <i class='bx bx-money-withdraw'></i>
@@ -67,8 +67,8 @@
 
             <div class="cardBox">
                 <div>
-                    <div id="monthly-expense" class="numbers"></div>
-                    <div class="cardName">Monthly Expense</div>
+                    <div id="current-expense" class="numbers"></div>
+                    <div class="cardName">Current Expense</div>
                 </div>
                 <div class="iconBx">
                     <i class='bx bx-cart'></i>
@@ -86,11 +86,18 @@
             </div>
         </div>
 
-
         <div class="transactions">
             <div class="recentTransactions">
                 <div class="cardHeader">
                     <h2>Recent transactions</h2>
+                    <div class="table-controls">
+                        <select id="timeFilter">
+                            <option value="all">All Time</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
                     <a href="#" class="ViewAllBtn">+</a>
                 </div>
                 <table>

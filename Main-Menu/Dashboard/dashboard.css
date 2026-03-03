@@ -370,6 +370,12 @@ body {
     border-radius: 10px;
 
 }
+
+#timeFilter{
+    background: #4a71e0;
+    color:white;   
+    padding: 6px 10px;
+}
 /* Responsive: Stack them on mobile */
 @media (max-width: 991px) {
     .cardContainer {

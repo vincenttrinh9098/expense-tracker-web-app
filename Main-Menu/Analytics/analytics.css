@@ -131,6 +131,53 @@ body {
     margin-left: 280px;
 }
 
+/* THE GRID SYSTEM 
+.cardContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    width: 100%;
+}
+*/
+
+.cardContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 500px));
+    gap: 30px;
+    justify-content: center;
+    /* centers smaller cards */
+}
+
+/* INDIVIDUAL BOX STYLING */
+.cardBox {
+    background: #fff;
+    padding-top:20px;
+    padding-bottom:60px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    transition: 0.3s;
+}
+
+.chart-container {
+    position: relative;
+    height: 250px;
+    /* fixed clean height */
+    width: 100%;
+
+}
+
+.chart-container h2 {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;   /* centers horizontally */
+
+}
+.table-controls {
+    text-align:center;
+}
 
 /* Responsive: Stack them on mobile */
 @media (max-width: 991px) {
