@@ -109,7 +109,7 @@ function updateExpenseChart(data) {
     if (expensePie) expensePie.destroy();
 
     expensePie = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: labels, 
             datasets: [{
