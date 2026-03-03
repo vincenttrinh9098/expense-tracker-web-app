@@ -19,13 +19,13 @@
         </div>
         <ul class="list">
 
-            <li class="list-item active">
+            <li class="list-item ">
                 <a href="../dashboard/dashboard.html">
                     <i class='bx bx-user'></i>
                     <span class="link-name" style="--i:1;">Dashboard</span>
                 </a>
             </li>
-            <li class="list-item">
+            <li class="list-item active">
                 <a href="../Analytics/analytics.html">
                     <i class='bx bx-analyse'></i>
                     <span class="link-name" style="--i:2;">Analytics</span>
@@ -62,9 +62,9 @@
                 <div class="chart-container">
                     <h2>Expenses</h2>
                     <div class="table-controls">
-                        <select id="timeFilter">
+                        <select id="expenseTimeFilter">
                             <option value="week">This Week</option>
-                            <option value="month">This Month</option>
+                            <option value="month" selected>This Month</option>
                             <option value="year">This Year</option>
                         </select>
                     </div>
@@ -74,7 +74,15 @@
     
             <div class="cardBox">
                 <div class="chart-container">
-                    <canvas id=""></canvas>
+                    <h2>Net Cash Flow</h2>
+                    <div class="table-controls">
+                        <select id="netFlowTimeFilter">
+                            <option value="week">This Week</option>
+                            <option value="month" selected>This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>                   
+                    <canvas id="lineChart"></canvas>
                 </div>    
             </div>
 

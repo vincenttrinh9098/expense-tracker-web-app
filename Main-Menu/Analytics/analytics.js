@@ -9,10 +9,11 @@ if (toggleBtn) {
 }
 
 
-let myChart;
+
 let allData = []; 
 const chartTypeSelect = document.getElementById('chartType');
-const timeDimensionSelect = document.getElementById('timeFilter');
+const expenseFilter = document.getElementById('expenseTimeFilter');
+const netFlowFilter = document.getElementById('netFlowTimeFilter');
 
 //FIREBASE DATA FETCHING
 onAuthStateChanged(auth, (user) => {
@@ -23,69 +24,31 @@ onAuthStateChanged(auth, (user) => {
         onSnapshot(q, (snapshot) => {
             allData = [];
             snapshot.forEach(doc => allData.push(doc.data()));
-            processAndRender(); 
+            
+            // Initial render: tell each chart to look at its own dropdown
+            const expPeriod = document.getElementById('expenseTimeFilter').value;
+            const netPeriod = document.getElementById('netFlowTimeFilter').value;
+
+            updateExpenseChart(filterByTime(allData, expPeriod));
+            updateNetFlowChart(filterByTime(allData, netPeriod), netPeriod);
         });
     }
 });
 
 //EVENT LISTENERS
-if (chartTypeSelect) chartTypeSelect.addEventListener('change', processAndRender);
-if (timeDimensionSelect) timeDimensionSelect.addEventListener('change', processAndRender);
 
-// 6. DATA PROCESSING LOGIC
-function processAndRender() {
-    const type = chartTypeSelect ? chartTypeSelect.value : 'pie';
-    const dimension = timeDimensionSelect ? timeDimensionSelect.value : 'all';
-    
-    let labels = [];
-    let values = [];
-    let chartTitle = '';
+expenseFilter.addEventListener('change', () => {
+    const period = expenseFilter.value;
+    const filtered = filterByTime(allData, period);
+    updateExpenseChart(filtered); 
+});
 
-    // 1. Filter raw data by the selected Time Range (Week/Month/Year)
-    const filteredByTime = filterByTime(allData, dimension);
-
-    if (type === 'pie') {
-        // --- PIE CHART: Group by Category ---
-        const categories = {};
-        filteredByTime.forEach(item => {
-            if (item.type === 'Expense') { // ONLY Expenses
-                categories[item.cat] = (categories[item.cat] || 0) + item.amount;
-            }
-        });
-        labels = Object.keys(categories);
-        values = Object.values(categories);
-        chartTitle = 'Spending by Category';
-    } else {
-        // --- BAR CHART: Group by Date/Month ---
-        const timeGroups = {};
-        
-        filteredByTime.forEach(item => {
-            if (item.type === 'Expense') { // ONLY Expenses
-                let key = (dimension === 'year') ? item.date.substring(0, 7) : item.date;
-                timeGroups[key] = (timeGroups[key] || 0) + item.amount;
-            }
-        });
-
-        // Sort keys chronologically
-        const sortedKeys = Object.keys(timeGroups).sort();
-        
-        // Make labels look nice (e.g., "Mar" instead of "2026-03")
-        labels = sortedKeys.map(key => {
-            if (dimension === 'year') {
-                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                const monthIndex = parseInt(key.split('-')[1]) - 1;
-                return monthNames[monthIndex];
-            }
-            return key; // Keep YYYY-MM-DD for week/month
-        });
-
-        values = sortedKeys.map(k => timeGroups[k]);
-        chartTitle = dimension === 'year' ? 'Monthly Expenses' : 'Expenses';
-    }
-
-    renderChart(type, labels, values, chartTitle);
-}
-
+// Listener for the Line Chart
+netFlowFilter.addEventListener('change', () => {
+    const period = netFlowFilter.value;
+    const filtered = filterByTime(allData, period);
+    updateNetFlowChart(filtered, period); // Needs period for Month vs Day labels
+});
 
 function filterByTime(data, period) {
     if (period === 'all') return data;
@@ -113,30 +76,155 @@ function filterByTime(data, period) {
     });
 }
 
-// 7. CHART.JS RENDERING
-function renderChart(type, labels, values, title) {
+
+
+// Global variables for the new charts
+let categoryPie;
+let comparisonBar;
+let expensePie;
+
+
+
+function updateExpenseChart(data) {
+    // 1. Create a "Bucket" for categories
+    const categories = {};
+
+    // 2. Fill the bucket
+    data.forEach(item => {
+        if (item.type === 'Expense') { 
+            // If category doesn't exist, start at 0, then add the amount
+            categories[item.cat] = (categories[item.cat] || 0) + item.amount;
+        }
+    });
+
+    // 3. Extract the names (Labels) and the totals (Values)
+    const labels = Object.keys(categories);
+    const values = Object.values(categories);
+
+    // 4. Get the Canvas
     const canvas = document.getElementById('expenseChart');
-    if (!canvas) return; // Prevent error if canvas isn't on page
-
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    if (myChart) myChart.destroy();
+    // 5. Clear the old chart
+    if (expensePie) expensePie.destroy();
 
-    myChart = new Chart(ctx, {
-        type: type,
+    expensePie = new Chart(ctx, {
+        type: 'pie',
         data: {
-            labels: labels,
+            labels: labels, 
             datasets: [{
-                label: title,
-                data: values,
-                backgroundColor: type === 'pie' 
-                    ? ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
-                    : '#d6254b',
-                borderWidth: 1
+                label: 'Expenses ($)',
+                data: values, // [50, 1200, etc.]
+                backgroundColor: [
+                    '#FF6384', // Rose
+                    '#36A2EB', // Blue
+                    '#FFCE56', // Yellow
+                    '#4BC0C0', // Teal
+                    '#9966FF', // Purple
+                    '#FF9F40'  // Orange
+                ],
+                hoverOffset: 10 // Makes the slice pop out when hovered
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom', // Moves labels to the bottom for more space
+                }
+            }
         }
     });
 }
+
+
+let netFlowLine;
+
+function updateNetFlowChart(data, dimension) {
+    const flowGroups = {};
+    
+    data.forEach(item => {
+        const key = (dimension === 'year') ? item.date.substring(0, 7) : item.date;
+        if (!flowGroups[key]) flowGroups[key] = 0;
+        
+        // Add Income, Subtract Expense
+        const amount = (item.type === 'Income') ? item.amount : -item.amount;
+        flowGroups[key] += amount;
+    });
+
+    // 1. Get the sorted keys (e.g., ["2026-01", "2026-02"])
+    const sortedKeys = Object.keys(flowGroups).sort();
+    
+    // 2. Create Pretty Labels (The fix for your "broken" labels)
+    const prettyLabels = sortedKeys.map(key => {
+        if (dimension === 'year') {
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const monthIndex = parseInt(key.split('-')[1]) - 1;
+            return monthNames[monthIndex];
+        }
+        return key; // Returns YYYY-MM-DD for week/month views
+    });
+
+    // 3. Accumulation Logic
+    let runningTotal = 0;
+    const values = sortedKeys.map(key => {
+        runningTotal += flowGroups[key];
+        return runningTotal;
+    });
+
+    // 4. Render
+    const canvas = document.getElementById('lineChart');
+    if (!canvas) return; // Safety check
+    
+    const ctx = canvas.getContext('2d');
+    if (netFlowLine) netFlowLine.destroy();
+
+    netFlowLine = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: prettyLabels, // Fixed: Now matches the variable above
+            datasets: [{
+                label: 'Net Cash Flow ($)',
+                data: values,
+                borderColor: '#2ecc71',
+                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                fill: true, 
+                tension: 0.3,
+                pointRadius: 5,
+                pointBackgroundColor: '#27ae60'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    grid: {
+                        // Darkens the line at $0
+                        color: (context) => context.tick.value === 0 ? '#000' : '#e0e0e0',
+                        lineWidth: (context) => context.tick.value === 0 ? 2 : 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+//OLD FUNCTIONS
+/*
+if (chartTypeSelect) chartTypeSelect.addEventListener('change', processAndRender);
+
+function processAndRender() {
+    const dimension = timeDimensionSelect.value;
+    const filteredByTime = filterByTime(allData, dimension);
+
+    updateExpenseChart(filteredByTime);
+
+    updateNetFlowChart(filteredByTime,dimension);
+
+}
+
+
+*/
