@@ -1,0 +1,6 @@
+For analytical basis charts:
+https://www.chartjs.org/docs/latest/samples/line/point-styling.html
+
+
+BackEnd:
+https://firebase.google.com/
