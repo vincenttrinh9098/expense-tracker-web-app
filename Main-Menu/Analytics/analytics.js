@@ -2,6 +2,16 @@ import { db, auth, collection, query, where, onSnapshot, onAuthStateChanged } fr
 
 const sidebar = document.querySelector('.sidebar');
 const toggleBtn = document.querySelector('.toggle-btn');
+
+window.addEventListener('DOMContentLoaded', () => {
+  const body = document.body;
+  const savedTheme = localStorage.getItem('selectedTheme');
+  if (savedTheme && savedTheme !== 'default') {
+    body.classList.add(`${savedTheme}-theme`);
+  }
+});
+
+
 if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
         sidebar.classList.toggle('active');

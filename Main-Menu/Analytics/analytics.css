@@ -14,7 +14,7 @@ body {
     left: 0;
     width: 80px;
     height: 100%;
-    background: #4a71e0;
+    background: var(--primary-color);
     border-right: 2px solid rgba(255, 255, 255, .2);
     box-shadow: 0 0 10px rgba(0, 0, 0, .2);
     padding: 6px 14px;

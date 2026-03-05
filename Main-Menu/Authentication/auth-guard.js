@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged,signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { 
-    getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy 
+    getFirestore, collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy, getDoc, setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -18,9 +18,26 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app); // Export the database
 export { 
-    collection, addDoc, query, where, onSnapshot, deleteDoc, doc, orderBy, 
+    collection, addDoc, query, where, onSnapshot, deleteDoc, doc, getDoc, setDoc, orderBy, 
     onAuthStateChanged, signOut 
 };
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists() && userDoc.data().theme) {
+            const userTheme = userDoc.data().theme;
+                        
+            localStorage.setItem('selectedTheme', userTheme);
+                        
+            applyTheme(userTheme);
+        }
+    }else{
+        localStorage.removeItem('selectedTheme');
+        applyTheme('default');
+    }
+});
+
 // THE BOUNCER LOGIC
 onAuthStateChanged(auth, (user) => {
 if (!user) {
@@ -44,6 +61,7 @@ const signOutBtn = document.querySelector('.bx-exit').parentElement;
 signOutBtn.addEventListener('click', (e) => {
     e.preventDefault();
     signOut(auth).then(() => {
+        localStorage.removeItem('selectedTheme');
         console.log("User signed out");
         window.location.href = "../../index.html";
     }).catch((error) => {

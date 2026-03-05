@@ -1,0 +1,13 @@
+:root {
+--primary-color: #4a71e0;
+}
+
+
+/* Pink Theme */
+.pink-theme {
+--primary-color:#d279a5;
+}
+
+.forest-theme{
+--primary-color:#4a7f48;
+}

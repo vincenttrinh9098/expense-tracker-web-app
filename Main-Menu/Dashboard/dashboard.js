@@ -5,9 +5,19 @@ import {
 const sidebar = document.querySelector('.sidebar');
 const toggleBtn = document.querySelector('.toggle-btn');
 
+window.addEventListener('DOMContentLoaded', () => {
+  const body = document.body;
+  const savedTheme = localStorage.getItem('selectedTheme');
+  if (savedTheme && savedTheme !== 'default') {
+    body.classList.add(`${savedTheme}-theme`);
+  }
+});
+
 toggleBtn.addEventListener('click',() =>{
     sidebar.classList.toggle('active');
 });
+
+
 
 const modal = document.getElementById('modalOverlay');
 const openModalBtn = document.querySelector('.ViewAllBtn');
