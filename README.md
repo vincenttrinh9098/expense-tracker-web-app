@@ -4,6 +4,8 @@ Track your spending habits with precision.
 
 🔗 **Live Demo:** [expense-tracker-web-app](https://vincenttrinh9098.github.io/expense-tracker-web-app/)
 
+![Expense-Tracker](expensetracker.png)
+
 ## About
 
 Expense Tracker is a simple, browser-based tool for keeping tabs on where your money goes. Log expenses, see your monthly spending trends, and understand your net cash flow at a glance.
